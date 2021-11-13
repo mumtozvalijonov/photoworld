@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 import os
@@ -40,7 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'account'
+    'rest_framework.authtoken',
+    'account',
+    'apps.article'
 ]
 
 MIDDLEWARE = [
@@ -137,3 +140,14 @@ AUTH_USER_MODEL = 'account.Account'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 STATIC_URL = '/static/'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'username',
+    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=20)
+}
