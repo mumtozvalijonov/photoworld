@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'account',
-    'apps.article'
+    'apps.photo'
 ]
 
 MIDDLEWARE = [
@@ -145,9 +145,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10
 }
 
 SIMPLE_JWT = {
     'USER_ID_FIELD': 'username',
-    'ACCESS_TOKEN_LIFETIME': timedelta(seconds=20)
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30)
 }
