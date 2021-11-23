@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 
 from uuid import uuid4
 
@@ -15,6 +15,14 @@ class Photo(models.Model):
     def likes_count(self):
         return self.likes.count()
 
+    @property
+    def dislikes_count(self):
+        return self.dislikes.count()
+
+    @property
+    def comments_count(self):
+        return self.comments.count()
+
 
 class Reaction(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
@@ -29,19 +37,26 @@ class Like(Reaction):
     photo = models.ForeignKey(Photo, on_delete=models.CASCADE, related_name='likes')
 
     def save(self, *args, **kwargs):
-        if self.__class__.objects.filter(author=self.author, photo=self.photo).exists():
-            return
-        Dislike.objects.filter(author=self.author, photo=self.photo).delete()
-        super().save(*args, **kwargs)
+        with transaction.atomic():
+            Dislike.objects.filter(author=self.author, photo=self.photo).delete()
+            if self.__class__.objects.filter(author=self.author, photo=self.photo).exists():
+                return
+            super().save(*args, **kwargs)
 
 
 class Dislike(Reaction):
     author = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='dislikes')
     photo = models.ForeignKey(Photo, on_delete=models.CASCADE, related_name='dislikes')
 
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            Like.objects.filter(author=self.author, photo=self.photo).delete()
+            if self.__class__.objects.filter(author=self.author, photo=self.photo).exists():
+                return
+            super().save(*args, **kwargs)
+
 
 class Comment(Reaction):
-    author = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='comments')
     photo = models.ForeignKey(Photo, on_delete=models.CASCADE, related_name='comments')
-    author = models.ForeignKey(Account, null=True, on_delete=models.SET_NULL)
+    author = models.ForeignKey(Account, null=True, on_delete=models.SET_NULL, related_name='comments')
     text = models.TextField()
