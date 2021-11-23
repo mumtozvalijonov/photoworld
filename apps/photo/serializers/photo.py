@@ -12,11 +12,3 @@ class PhotoSerializer(serializers.ModelSerializer):
         model = models.Photo
         fields = '__all__'
         read_only_fields = ('author',)
-
-
-class PhotoCommentSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.Comment
-        fields = '__all__'
-        read_only_fields = ('photo', 'author')

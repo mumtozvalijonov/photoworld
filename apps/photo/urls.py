@@ -6,6 +6,7 @@ from apps.photo import views
 
 
 router = SimpleRouter()
+router.register('comments', views.CommentViewSet)
 router.register('', views.PhotoViewSet)
 
 
