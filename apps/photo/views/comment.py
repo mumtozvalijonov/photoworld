@@ -3,12 +3,13 @@ import django_filters
 
 from apps.photo.models import Comment
 from apps.photo.serializers import CommentSerializer
-
+from apps.photo.permissions import IsCommentAuthor
+from apps.photo.serializers.comment import CommentUpdateSerializer
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    serializer_class = CommentSerializer
     queryset = Comment.objects.all()
+    permission_classes = [IsCommentAuthor]
     
     filter_backends = (filters.OrderingFilter, django_filters.rest_framework.DjangoFilterBackend, filters.SearchFilter)
     filterset_fields = ('photo',)
@@ -19,6 +20,11 @@ class CommentViewSet(viewsets.ModelViewSet):
         '@text',
         '=author__username'
     )
+
+    def get_serializer_class(self):
+        if self.action in ['update', 'partial_update']:
+            return CommentUpdateSerializer
+        return CommentSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

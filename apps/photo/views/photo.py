@@ -3,14 +3,14 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.photo.models import Photo
-from apps.photo.permissions import IsAuthor
+from apps.photo.permissions import IsPhotoAuthor
 from apps.photo.serializers import PhotoSerializer
 
 
 class PhotoViewSet(viewsets.ModelViewSet):
     serializer_class = PhotoSerializer
     queryset = Photo.objects.all()
-    permission_classes = [IsAuthor]
+    permission_classes = [IsPhotoAuthor]
 
     filter_backends = (filters.OrderingFilter,)
     ordering_fields = ('uploaded_at',)
