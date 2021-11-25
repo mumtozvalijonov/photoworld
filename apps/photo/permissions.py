@@ -12,4 +12,8 @@ class IsCommentAuthor(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        return obj.author == request.user
+        
+        user_is_author = obj.author == request.user
+        if view.action == 'destroy':
+            return user_is_author | request.user.groups.filter(name='moderator').exists()
+        return user_is_author

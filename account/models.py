@@ -1,10 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, _user_has_perm, _user_has_module_perms, PermissionsMixin
 
 from account.managers import UserManager
 
 
-class Account(AbstractBaseUser):
+class Account(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(primary_key=True, max_length=50)
     email = models.EmailField()
     is_active = models.BooleanField(default=True)
@@ -29,6 +29,10 @@ class Account(AbstractBaseUser):
         "Is the user a admin member?"
         return self.admin
 
+    @property
+    def is_superuser(self):
+        return self.is_admin
+
     def get_full_name(self):
         # The user is identified by their email address
         return self.email
@@ -43,9 +47,10 @@ class Account(AbstractBaseUser):
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
         # Simplest possible answer: Yes, always
-        return True
+        return _user_has_perm(self, perm, obj)
 
-    def has_module_perms(self, app_label):
-        "Does the user have permissions to view the app `app_label`?"
-        # Simplest possible answer: Yes, always
-        return True
+    def has_perms(self, perm_list, obj=None):
+        return all(self.has_perm(perm, obj) for perm in perm_list)
+
+    def has_module_perms(self, module):
+        return _user_has_module_perms(self, module)
