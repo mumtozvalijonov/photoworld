@@ -9,4 +9,5 @@ from account.serializers import AccountSerializer
 class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-    permission_classes = [AccountPermission, permissions.IsAuthenticatedOrReadOnly]
+
+    permission_classes = [AccountPermission]
