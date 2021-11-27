@@ -7,9 +7,10 @@ from io import BytesIO
 
 from account.models import Account
 from apps.photo.models import Photo
+from core.tests import CoreTestCase
 
 
-class PhotoTests(APITestCase):
+class PhotoTests(CoreTestCase):
 
     def test_list_photo(self):
         url = reverse('photo-list')
@@ -26,9 +27,7 @@ class PhotoTests(APITestCase):
             password=password
         )
 
-        url = reverse('token_obtain_pair')
-        login_response = self.client.post(url, data={'username': username, 'password': password})
-        access_token = login_response.json()['access']
+        access_token = self.login_user(username, password)
 
         # headers = {'Authorization': f'Bearer {access_token}'}
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
