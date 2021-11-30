@@ -14,6 +14,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
     bio = models.TextField(null=True, blank=True)
     profile_photo = models.ImageField(upload_to='images/', null=True, blank=True)
 
+    followers = models.ManyToManyField(to='self', blank=True, related_name='following', symmetrical=False)
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
@@ -54,3 +56,11 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     def has_module_perms(self, module):
         return _user_has_module_perms(self, module)
+
+    @property
+    def followers_count(self):
+        return self.followers.count()
+
+    @property
+    def following_count(self):
+        return Account.objects.filter(followers=self).count()
